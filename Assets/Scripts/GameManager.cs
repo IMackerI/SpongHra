@@ -2,14 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    public static NewBehaviourScript Instance { get; private set; }
+    public static GameManager Instance { get; private set; }
 
-    public enum State { PLAYERMOVE, PLAYERSELECT};
+    public enum State { PLAYING, LEVELCOMPLETE };
     State _state;
-    public GameObject Player;
-    public GameObject Level;
+    public GameObject[] levels;
+    GameObject _currentLevel;
+    int _levelIndex;
+
+    public List<GameObject> players;
 
     bool _isSwitchingState;
 
@@ -29,17 +32,50 @@ public class NewBehaviourScript : MonoBehaviour
     }
     void Start()
     {
+        foreach(GameObject level in levels)
+        {
+            level.SetActive(false);
+        }
         Instance = this;
-        Switchstate(State.PLAYERMOVE);
+        _currentLevel = levels[0];
+        _currentLevel.SetActive(true);
+        _levelIndex = 0;
+        getObjects();
+        Switchstate(State.PLAYING);
+    }
+
+    void getObjects()
+    {
+        foreach(Transform t in _currentLevel.transform)
+        {
+            if(t.tag == "Player")
+            {
+                players.Add(t.gameObject);
+            }
+        }
+    }
+
+    public void Reselect()
+    {
+        foreach (GameObject player in players)
+        {
+            player.GetComponent<Player>()._active = false;
+        }
     }
 
     void BeginState(State newState)
     {
         switch (_state)
         {
-            case State.PLAYERMOVE:
+            case State.PLAYING:
+                Debug.Log("PlayingSTART");
                 break;
-            case State.PLAYERSELECT:
+            case State.LEVELCOMPLETE:
+                _currentLevel.SetActive(false);
+                _levelIndex++;
+                _currentLevel = levels[_levelIndex];
+                _currentLevel.SetActive(true);
+                Switchstate(State.PLAYING);
                 break;
         }
     }
@@ -48,9 +84,7 @@ public class NewBehaviourScript : MonoBehaviour
     {
         switch (_state)
         {
-            case State.PLAYERMOVE:
-                break;
-            case State.PLAYERSELECT:
+            case State.PLAYING:
                 break;
         }
     }
@@ -59,9 +93,15 @@ public class NewBehaviourScript : MonoBehaviour
     {
         switch (_state)
         {
-            case State.PLAYERMOVE:
+            case State.PLAYING:
+                Debug.Log("PlayingEND");
+                foreach(GameObject player in players)
+                {
+                    player.GetComponent<Player>()._active = false;
+                }
                 break;
-            case State.PLAYERSELECT:
+            case State.LEVELCOMPLETE:
+                getObjects();
                 break;
         }
     }
