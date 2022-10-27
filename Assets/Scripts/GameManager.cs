@@ -6,11 +6,13 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public enum State { PLAYING, LEVELCOMPLETE };
+    public enum State { INNIT, MOVED, LEVELCOMPLETE, LEVELLOST };
     State _state;
     public GameObject[] levels;
+    public int[] levelMoves;
     GameObject _currentLevel;
-    int _levelIndex;
+    public int _currentMoves;
+    public int _levelIndex;
 
     public List<GameObject> players;
 
@@ -32,20 +34,21 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        foreach(GameObject level in levels)
-        {
-            level.SetActive(false);
-        }
         Instance = this;
-        _currentLevel = levels[0];
-        _currentLevel.SetActive(true);
-        _levelIndex = 0;
-        getObjects();
-        Switchstate(State.PLAYING);
+        Restart(0);
     }
 
-    void getObjects()
+    void Restart(int levelIndex)
     {
+        Debug.Log("Restarting on level:" + _levelIndex);
+        if(_currentLevel != null)
+        {
+            Destroy(_currentLevel);
+        }
+        _levelIndex = levelIndex;
+        _currentLevel = Instantiate(levels[_levelIndex]);
+
+        players.Clear();
         foreach(Transform t in _currentLevel.transform)
         {
             if(t.tag == "Player")
@@ -53,13 +56,15 @@ public class GameManager : MonoBehaviour
                 players.Add(t.gameObject);
             }
         }
+        _currentMoves = levelMoves[_levelIndex];
+        Switchstate(State.INNIT);
     }
 
     public void Reselect()
     {
         foreach (GameObject player in players)
         {
-            player.GetComponent<Player>()._active = false;
+            player.GetComponent<Player>().active = false;
         }
     }
 
@@ -67,24 +72,47 @@ public class GameManager : MonoBehaviour
     {
         switch (_state)
         {
-            case State.PLAYING:
-                Debug.Log("PlayingSTART");
+            case State.MOVED:
+                Debug.Log("Started Playing");
+                //Move other Players
+                foreach (GameObject player in players)
+                {
+                    if (player.GetComponent<Player>().active == false)
+                    {
+                        player.GetComponent<PlayerAuto>().MoveAuto();
+                    }
+                }
+
+                //Deactivate Players
+                foreach (GameObject player in players)
+                {
+                    player.GetComponent<Player>().active = false;
+                }
+
+                //check if they lost/won
+                bool won = true;
+                foreach (GameObject player in players)
+                {
+                    if (player.GetComponent<Player>().won == false)
+                        won = false;
+                }
+                _currentMoves--;
+                if (won)
+                {
+                    Debug.Log("Won");
+                    Switchstate(State.LEVELCOMPLETE);
+                }
+                else if (_currentMoves == 0)
+                {
+                    Debug.Log("Lost");
+                    Switchstate(State.LEVELLOST);
+                }
                 break;
             case State.LEVELCOMPLETE:
-                _currentLevel.SetActive(false);
-                _levelIndex++;
-                _currentLevel = levels[_levelIndex];
-                _currentLevel.SetActive(true);
-                Switchstate(State.PLAYING);
+                Restart(_levelIndex + 1);
                 break;
-        }
-    }
-
-    void Update()
-    {
-        switch (_state)
-        {
-            case State.PLAYING:
+            case State.LEVELLOST:
+                Restart(_levelIndex);
                 break;
         }
     }
@@ -93,16 +121,7 @@ public class GameManager : MonoBehaviour
     {
         switch (_state)
         {
-            case State.PLAYING:
-                Debug.Log("PlayingEND");
-                foreach(GameObject player in players)
-                {
-                    player.GetComponent<Player>()._active = false;
-                }
-                break;
-            case State.LEVELCOMPLETE:
-                getObjects();
-                break;
+
         }
     }
 }
