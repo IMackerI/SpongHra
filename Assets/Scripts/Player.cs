@@ -6,13 +6,24 @@ public class Player : MonoBehaviour
 {
     public bool active;
     public bool won;
+    bool moved;
     GameManager _gameManager;
-    bool CantDoW, CantDoA, CantDoS, CantDoD;
+    bool CanDoW, CanDoA, CanDoS, CanDoD;
     void Start()
     {
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         active = false;
         won = false;
+        moved = false;
+    }
+
+    public void CheckWon()
+    {
+        if (Vector3.Distance(_gameManager._currentTarget, transform.position) < 0.8f)
+        {
+            won = true;
+            GetComponent<BoxCollider>().enabled = false;
+        }
     }
 
     void Moved()
@@ -29,71 +40,80 @@ public class Player : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         RaycastHit hit;
         // Does the ray intersect any objects excluding the player layer
-        if (CantDoW = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), out hit, 1))
+        if (CanDoW = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), out hit, 1))
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.up) * hit.distance, Color.yellow);
             //Debug.Log("Did Hit");
         }
-        if (CantDoD = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, 1))
+        if (CanDoD = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, 1))
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * hit.distance, Color.yellow);
             //Debug.Log("Did Hit");
         }
-        if (CantDoA = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out hit, 1))
+        if (CanDoA = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out hit, 1))
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * hit.distance, Color.yellow);
             //Debug.Log("Did Hit");
         }
-        if (CantDoS = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), out hit, 1))
+        if (CanDoS = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, 1))
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow);
             //Debug.Log("Did Hit");
         }
-
     }
 
     void Update()
-    {
+    { 
         if (active)
         {
-            if (CantDoD == false)
+            if (CanDoD)
             {
                 if (Input.GetKeyDown(KeyCode.D))
                 {
-                    transform.position = new Vector3(transform.position.x + 1, transform.position.y, transform.position.z);
-                    Moved();
+                    transform.Rotate(Vector3.forward * -90);
+                    transform.position += transform.up;
+                    moved = true;
                 }
             }
 
-            if (CantDoA == false)
+            if (CanDoA)
             {
                 if (Input.GetKeyDown(KeyCode.A))
                 {
-                    transform.position = new Vector3(transform.position.x - 1, transform.position.y, transform.position.z);
-                    Moved();
+                    transform.Rotate(Vector3.forward * 90);
+                    transform.position += transform.up;
+                    moved = true;
                 }
             }
 
-            if (CantDoW == false)
+            if (CanDoW)
             {
                 if (Input.GetKeyDown(KeyCode.W))
                 {
-                    transform.position = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
-                    Moved();
+                    transform.position += transform.up;
+                    moved = true;
                 }
             }
 
-            if (CantDoS == false)
+            if (CanDoS)
             {
                 if (Input.GetKeyDown(KeyCode.S))
                 {
-                    transform.position = new Vector3(transform.position.x, transform.position.y - 1, transform.position.z);
-                    //Moved();
+                    transform.Rotate(Vector3.forward * 180);
+                    transform.position += transform.up;
+                    moved = true;
                 }
+            }
+
+            if (moved)
+            {
+                CheckWon();
+                Moved();
+                moved = false;
             }
         }
     }

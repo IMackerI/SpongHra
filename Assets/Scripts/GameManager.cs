@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     GameObject _currentLevel;
     public int _currentMoves;
     public int _levelIndex;
+    public Vector3 _currentTarget;
 
     public List<GameObject> players;
 
@@ -57,6 +58,8 @@ public class GameManager : MonoBehaviour
             }
         }
         _currentMoves = levelMoves[_levelIndex];
+        _currentTarget = _currentLevel.transform.Find("Finish").position;
+
         Switchstate(State.INNIT);
     }
 
@@ -77,9 +80,10 @@ public class GameManager : MonoBehaviour
                 //Move other Players
                 foreach (GameObject player in players)
                 {
-                    if (player.GetComponent<Player>().active == false)
+                    if (player.GetComponent<Player>().active == false && player.GetComponent<Player>().won == false)
                     {
                         player.GetComponent<PlayerAuto>().MoveAuto();
+                        player.GetComponent<Player>().CheckWon();
                     }
                 }
 
