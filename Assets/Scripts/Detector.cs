@@ -11,17 +11,19 @@ public class Detector : MonoBehaviour
         Overlap = false;
     }
 
-    private void OnCollisionStay(Collision collision)
+    void FixedUpdate()
     {
-        if (Overlap == false)
+        RaycastHit hit;
+        // Does the ray intersect any objects excluding the player layer
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), out hit, 1))
         {
-            Overlap = true;
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.up) * hit.distance, Color.yellow);
+            Debug.Log("Did Hit");
         }
-        Debug.Log("Collision");
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        Overlap = false;
+        else
+        {
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.up) * 1000, Color.white);
+            //Debug.Log("Did not Hit");
+        }
     }
 }
