@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public bool won;
     bool moved;
     GameManager _gameManager;
-    bool CanDoW, CanDoA, CanDoS, CanDoD;
+    public bool CanDoW, CanDoA, CanDoS, CanDoD;
     void Start()
     {
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();

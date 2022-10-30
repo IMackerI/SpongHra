@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public Vector3 _currentTarget;
     public bool moving = false;
+    public bool outOfMoves = false;
 
     public int _currentMoves;
     public List<GameObject> players;
@@ -100,8 +101,7 @@ public class GameManager : MonoBehaviour
         }
         else if (_currentMoves == 0)
         {
-            Debug.Log("Lost");
-            Switchstate(State.LEVELLOST);
+            outOfMoves = true;
         }
     }
     void BeginState(State newState)
@@ -136,6 +136,16 @@ public class GameManager : MonoBehaviour
                     }
                     _currentMoves++;
                     Switchstate(State.MOVING);
+                }
+                if(Input.GetKeyDown(KeyCode.R))
+                {
+                    Switchstate(State.LEVELLOST);
+                }
+                break;
+            case State.MOVING:
+                if(Input.GetKeyDown(KeyCode.R))
+                {
+                    Switchstate(State.LEVELLOST);
                 }
                 break;
         }

@@ -17,9 +17,9 @@ public class PlayerAuto : MonoBehaviour
         }
         if (CanDoD = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, 1))
         {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * hit.distance, Color.yellow);
             //Debug.Log("Did Hit");
         }
+        Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * 1000, Color.yellow);
         if (CanDoA = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out hit, 1))
         {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * hit.distance, Color.yellow);
@@ -69,12 +69,13 @@ public class PlayerAuto : MonoBehaviour
         }
         else if (CanDoA)
         {
-            transform.Rotate(Vector3.forward * 180);
+            transform.Rotate(Vector3.forward * 90);
             transform.position += transform.up;
         }
         else if (CanDoS)
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y - 1, transform.position.z);
+            transform.Rotate(Vector3.forward * 180);
+            transform.position += transform.up;
         }
     }
 }

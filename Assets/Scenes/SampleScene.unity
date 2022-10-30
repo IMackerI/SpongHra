@@ -247,12 +247,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levels:
-  - {fileID: 326323075199735199, guid: e36a951ff6c1ade4d8c63c69d729b5a5, type: 3}
+  - {fileID: 3816463755322752212, guid: 223c59d9d87c46d4086aaf152156f0f0, type: 3}
   - {fileID: 3816463755322752212, guid: 86188f9eb2523f6419248b265e6ae07d, type: 3}
-  levelMoves: 0a00000005000000
+  - {fileID: 326323075199735199, guid: e36a951ff6c1ade4d8c63c69d729b5a5, type: 3}
+  levelMoves: 010000000500000005000000
   moveDelay: 0.5
   _currentTarget: {x: 0, y: 0, z: 0}
   moving: 0
+  outOfMoves: 0
   _currentMoves: 0
   players: []
 --- !u!4 &1427512748
