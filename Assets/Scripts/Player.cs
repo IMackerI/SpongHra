@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
 
     void Moved()
     {
-        _gameManager.Switchstate(GameManager.State.MOVED);
+        _gameManager.Switchstate(GameManager.State.MOVING);
     }
 
     private void OnMouseOver()
@@ -68,7 +68,7 @@ public class Player : MonoBehaviour
 
     void Update()
     { 
-        if (active)
+        if (active && !_gameManager.moving)
         {
             if (CanDoD)
             {

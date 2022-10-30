@@ -6,18 +6,20 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public enum State { INNIT, MOVED, LEVELCOMPLETE, LEVELLOST };
+    public enum State { MOVING, MOVED, LEVELCOMPLETE, LEVELLOST };
     State _state;
     public GameObject[] levels;
     public int[] levelMoves;
     GameObject _currentLevel;
-    public int _currentMoves;
-    public int _levelIndex;
+    public float moveDelay;
+    
+    int _levelIndex;
+    [HideInInspector]
     public Vector3 _currentTarget;
+    public bool moving = false;
 
+    public int _currentMoves;
     public List<GameObject> players;
-
-    bool _isSwitchingState;
 
     public void Switchstate(State newState, float delay = 0)
     {
@@ -26,12 +28,10 @@ public class GameManager : MonoBehaviour
 
     IEnumerator SwitchDelay(State newState, float delay)
     {
-        _isSwitchingState = true;
         yield return new WaitForSeconds(delay);
         EndState();
         _state = newState;
         BeginState(newState);
-        _isSwitchingState = false;
     }
     void Start()
     {
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
         _currentMoves = levelMoves[_levelIndex];
         _currentTarget = _currentLevel.transform.Find("Finish").position;
 
-        Switchstate(State.INNIT);
+        Switchstate(State.MOVED);
     }
 
     public void Reselect()
@@ -71,46 +71,48 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    IEnumerator MovedDelay()
+    {
+        foreach (GameObject player in players)
+        {
+            if (player.GetComponent<Player>().active == false && player.GetComponent<Player>().won == false)
+            {
+                //Move other Players
+                yield return new WaitForSeconds(moveDelay);
+                player.GetComponent<PlayerAuto>().MoveAuto();
+                player.GetComponent<Player>().CheckWon();
+                //Deactivate Players
+                player.GetComponent<Player>().active = false;
+            }
+        }
+        bool won = true;
+        foreach (GameObject player in players)
+        {
+            if (player.GetComponent<Player>().won == false)
+                won = false;
+        }
+        _currentMoves--;
+        if (won)
+        {
+            Debug.Log("Won");
+            Switchstate(State.LEVELCOMPLETE);
+        }
+        else if (_currentMoves == 0)
+        {
+            Debug.Log("Lost");
+            Switchstate(State.LEVELLOST);
+        }
+    }
     void BeginState(State newState)
     {
         switch (_state)
         {
-            case State.MOVED:
+            case State.MOVING:
                 Debug.Log("Started Playing");
-                //Move other Players
-                foreach (GameObject player in players)
-                {
-                    if (player.GetComponent<Player>().active == false && player.GetComponent<Player>().won == false)
-                    {
-                        player.GetComponent<PlayerAuto>().MoveAuto();
-                        player.GetComponent<Player>().CheckWon();
-                    }
-                }
-
-                //Deactivate Players
-                foreach (GameObject player in players)
-                {
-                    player.GetComponent<Player>().active = false;
-                }
-
-                //check if they lost/won
-                bool won = true;
-                foreach (GameObject player in players)
-                {
-                    if (player.GetComponent<Player>().won == false)
-                        won = false;
-                }
-                _currentMoves--;
-                if (won)
-                {
-                    Debug.Log("Won");
-                    Switchstate(State.LEVELCOMPLETE);
-                }
-                else if (_currentMoves == 0)
-                {
-                    Debug.Log("Lost");
-                    Switchstate(State.LEVELLOST);
-                }
+                moving = true;
+                Switchstate(State.MOVED, players.Count * moveDelay);
+                StartCoroutine(MovedDelay());
                 break;
             case State.LEVELCOMPLETE:
                 Restart(_levelIndex + 1);
@@ -121,11 +123,31 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        switch (_state)
+        {
+            case State.MOVED:
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    foreach(GameObject player in players)
+                    {
+                        player.GetComponent<Player>().active = false;
+                    }
+                    _currentMoves++;
+                    Switchstate(State.MOVING);
+                }
+                break;
+        }
+    }
+
     void EndState()
     {
         switch (_state)
         {
-
+            case State.MOVING:
+                moving = false;
+                break;
         }
     }
 }
