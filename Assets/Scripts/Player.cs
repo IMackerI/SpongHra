@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public bool active;
     public bool won;
     bool moved;
+    int lastMoved;
     GameManager _gameManager;
     public bool CanDoW, CanDoA, CanDoS, CanDoD;
     void Start()
@@ -77,6 +78,7 @@ public class Player : MonoBehaviour
                     transform.Rotate(Vector3.forward * -90);
                     transform.position += transform.up;
                     moved = true;
+                    lastMoved = 3;
                 }
             }
 
@@ -87,6 +89,7 @@ public class Player : MonoBehaviour
                     transform.Rotate(Vector3.forward * 90);
                     transform.position += transform.up;
                     moved = true;
+                    lastMoved = 1;
                 }
             }
 
@@ -96,6 +99,7 @@ public class Player : MonoBehaviour
                 {
                     transform.position += transform.up;
                     moved = true;
+                    lastMoved = 0;
                 }
             }
 
@@ -106,11 +110,13 @@ public class Player : MonoBehaviour
                     transform.Rotate(Vector3.forward * 180);
                     transform.position += transform.up;
                     moved = true;
+                    lastMoved = 2;
                 }
             }
 
             if (moved)
             {
+                _gameManager._lastMoved = lastMoved;
                 CheckWon();
                 Moved();
                 moved = false;

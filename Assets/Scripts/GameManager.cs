@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public enum State { MOVING, MOVED, LEVELCOMPLETE, LEVELLOST };
-    State _state;
+    public State _state;
     public GameObject[] levels;
     public int[] levelMoves;
     GameObject _currentLevel;
@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
 
     public int _currentMoves;
     public List<GameObject> players;
+    [HideInInspector]
+    public int _lastMoved;
 
     public void Switchstate(State newState, float delay = 0)
     {
@@ -81,6 +83,7 @@ public class GameManager : MonoBehaviour
             {
                 //Move other Players
                 yield return new WaitForSeconds(moveDelay);
+                player.GetComponent<PlayerAuto>().lastMoved = _lastMoved;
                 player.GetComponent<PlayerAuto>().MoveAuto();
                 player.GetComponent<Player>().CheckWon();
                 //Deactivate Players
