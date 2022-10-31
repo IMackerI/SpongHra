@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public bool active;
     public bool won;
     bool moved;
+    bool key;
     int lastMoved;
     GameManager _gameManager;
     public bool CanDoW, CanDoA, CanDoS, CanDoD;
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
         active = false;
         won = false;
         moved = false;
+        key = false;
     }
 
     public void CheckWon()
@@ -24,6 +26,14 @@ public class Player : MonoBehaviour
         {
             won = true;
             GetComponent<BoxCollider>().enabled = false;
+        }
+    }
+
+    public void HasKey() //implemented now
+    {
+        if (Vector3.Distance(_gameManager._currentKeyTarget, transform.position) < 0.8f)
+        {
+            key = true;
         }
     }
 

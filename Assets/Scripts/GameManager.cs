@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     int _levelIndex;
     [HideInInspector]
     public Vector3 _currentTarget;
+    public Vector3 _currentKeyTarget; //done now
     public bool moving = false;
     public bool outOfMoves = false;
 
@@ -62,6 +63,7 @@ public class GameManager : MonoBehaviour
         }
         _currentMoves = levelMoves[_levelIndex];
         _currentTarget = _currentLevel.transform.Find("Finish").position;
+        _currentKeyTarget = _currentLevel.transform.Find("Key").position; //implemented now
 
         Switchstate(State.MOVED);
     }
