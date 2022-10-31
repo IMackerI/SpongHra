@@ -10,17 +10,19 @@ public class GameManager : MonoBehaviour
     public State _state;
     public GameObject[] levels;
     public int[] levelMoves;
+    public bool[] hasKey;
     GameObject _currentLevel;
     public float moveDelay;
     
     int _levelIndex;
     [HideInInspector]
     public Vector3 _currentTarget;
-    public Vector3 _currentKeyTarget; //done now
+    public GameObject _currentKeyTarget; //done now
     public bool moving = false;
     public bool outOfMoves = false;
 
     public int _currentMoves;
+    public bool _currenthasKey;
     public List<GameObject> players;
     [HideInInspector]
     public int _lastMoved;
@@ -63,7 +65,11 @@ public class GameManager : MonoBehaviour
         }
         _currentMoves = levelMoves[_levelIndex];
         _currentTarget = _currentLevel.transform.Find("Finish").position;
-        _currentKeyTarget = _currentLevel.transform.Find("Key").position; //implemented now
+        _currenthasKey = hasKey[_levelIndex];
+        if (_currenthasKey)
+        {
+            _currentKeyTarget = _currentLevel.transform.Find("Key").gameObject; //implemented now
+        }
 
         Switchstate(State.MOVED);
     }
@@ -87,7 +93,12 @@ public class GameManager : MonoBehaviour
                 yield return new WaitForSeconds(moveDelay);
                 player.GetComponent<PlayerAuto>().lastMoved = _lastMoved;
                 player.GetComponent<PlayerAuto>().MoveAuto();
+                if (player.GetComponent<Player>().key)
+                {
+                    _currentKeyTarget.transform.position = player.transform.position;
+                }
                 player.GetComponent<Player>().CheckWon();
+                player.GetComponent<Player>().HasKey();
                 //Deactivate Players
                 player.GetComponent<Player>().active = false;
             }

@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
     public bool active;
     public bool won;
     bool moved;
-    bool key;
+    public bool key;
     int lastMoved;
     GameManager _gameManager;
     public bool CanDoW, CanDoA, CanDoS, CanDoD;
@@ -31,14 +31,21 @@ public class Player : MonoBehaviour
 
     public void HasKey() //implemented now
     {
-        if (Vector3.Distance(_gameManager._currentKeyTarget, transform.position) < 0.8f)
+        if(_gameManager._currenthasKey)
         {
-            key = true;
+            if (Vector3.Distance(_gameManager._currentKeyTarget.transform.position, transform.position) < 0.8f)
+            {
+                key = true;
+            }
         }
     }
 
     void Moved()
     {
+        if(key)
+        {
+            _gameManager._currentKeyTarget.transform.position = transform.position;
+        }
         _gameManager.Switchstate(GameManager.State.MOVING);
     }
 
@@ -79,7 +86,7 @@ public class Player : MonoBehaviour
 
     void Update()
     { 
-        if (active && !_gameManager.moving)
+        if (active && !_gameManager.moving && !won)
         {
             if (CanDoD)
             {
@@ -128,6 +135,7 @@ public class Player : MonoBehaviour
             {
                 _gameManager._lastMoved = lastMoved;
                 CheckWon();
+                HasKey();
                 Moved();
                 moved = false;
             }
