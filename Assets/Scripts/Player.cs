@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    GameManager _gameManager;
+
     public bool active;
     public bool won;
-    bool moved;
     public bool key;
+    public GameObject WCube, ACube, SCube, DCube;
+
+
+    bool moved;
     int lastMoved;
-    GameManager _gameManager;
     public bool CanDoW, CanDoA, CanDoS, CanDoD;
+
     void Start()
     {
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -18,6 +23,10 @@ public class Player : MonoBehaviour
         won = false;
         moved = false;
         key = false;
+        WCube.SetActive(false);
+        ACube.SetActive(false);
+        SCube.SetActive(false);
+        DCube.SetActive(false);
     }
 
     public void CheckWon()
@@ -58,87 +67,98 @@ public class Player : MonoBehaviour
         }
     }
 
+    /*
     private void FixedUpdate()
     {
         RaycastHit hit;
-        // Does the ray intersect any objects excluding the player layer
-        if (CanDoW = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), out hit, 1))
-        {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.up) * hit.distance, Color.yellow);
-            //Debug.Log("Did Hit");
-        }
-        if (CanDoD = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, 1))
-        {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.right) * hit.distance, Color.yellow);
-            //Debug.Log("Did Hit");
-        }
-        if (CanDoA = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out hit, 1))
-        {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.left) * hit.distance, Color.yellow);
-            //Debug.Log("Did Hit");
-        }
-        if (CanDoS = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, 1))
-        {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.down) * hit.distance, Color.yellow);
-            //Debug.Log("Did Hit");
-        }
+        CanDoW = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), out hit, 1);
+        CanDoD = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, 1);
+        CanDoA = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out hit, 1);
+        CanDoS = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, 1);
     }
+    */
 
     void Update()
     { 
         if (active && !_gameManager.moving && !won)
         {
-            if (CanDoD)
+            RaycastHit hit;
+            CanDoW = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.up), out hit, 1);
+            CanDoD = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.right), out hit, 1);
+            CanDoA = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.left), out hit, 1);
+            CanDoS = !Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, 1);
+
+
+            if (CanDoW)
             {
-                if (Input.GetKeyDown(KeyCode.D))
-                {
-                    transform.Rotate(Vector3.forward * -90);
-                    transform.position += transform.up;
-                    moved = true;
-                    lastMoved = 3;
-                }
+                WCube.SetActive(true);
+            }
+            if (WCube.GetComponent<DirectionScript>().selected)
+            {
+                transform.position += transform.up;
+                moved = true;
+                lastMoved = 0;
+                WCube.GetComponent<DirectionScript>().selected = false;
             }
 
             if (CanDoA)
             {
-                if (Input.GetKeyDown(KeyCode.A))
-                {
-                    transform.Rotate(Vector3.forward * 90);
-                    transform.position += transform.up;
-                    moved = true;
-                    lastMoved = 1;
-                }
+                ACube.SetActive(true);
             }
-
-            if (CanDoW)
+            if (ACube.GetComponent<DirectionScript>().selected)
             {
-                if (Input.GetKeyDown(KeyCode.W))
-                {
-                    transform.position += transform.up;
-                    moved = true;
-                    lastMoved = 0;
-                }
+                transform.Rotate(Vector3.forward * 90);
+                transform.position += transform.up;
+                moved = true;
+                lastMoved = 1;
+                ACube.GetComponent<DirectionScript>().selected = false;
             }
 
             if (CanDoS)
             {
-                if (Input.GetKeyDown(KeyCode.S))
-                {
-                    transform.Rotate(Vector3.forward * 180);
-                    transform.position += transform.up;
-                    moved = true;
-                    lastMoved = 2;
-                }
+                SCube.SetActive(true);
+            }
+            if (SCube.GetComponent<DirectionScript>().selected)
+            {
+                transform.Rotate(Vector3.forward * 180);
+                transform.position += transform.up;
+                moved = true;
+                lastMoved = 2;
+                SCube.GetComponent<DirectionScript>().selected = false;
+            }
+
+            if (CanDoD)
+            {
+                DCube.SetActive(true);
+            }
+            if (DCube.GetComponent<DirectionScript>().selected)
+            {
+                transform.Rotate(Vector3.forward * -90);
+                transform.position += transform.up;
+                moved = true;
+                lastMoved = 3;
+                DCube.GetComponent<DirectionScript>().selected = false;
             }
 
             if (moved)
             {
+                WCube.SetActive(false);
+                ACube.SetActive(false);
+                SCube.SetActive(false);
+                DCube.SetActive(false);
                 _gameManager._lastMoved = lastMoved;
                 CheckWon();
                 HasKey();
                 Moved();
                 moved = false;
             }
+        }
+        else
+        {
+            WCube.SetActive(false);
+            ACube.SetActive(false);
+            SCube.SetActive(false);
+            DCube.SetActive(false);
         }
     }
 }

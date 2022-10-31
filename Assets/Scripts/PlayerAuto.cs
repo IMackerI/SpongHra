@@ -8,7 +8,7 @@ public class PlayerAuto : MonoBehaviour
 
     //0 - W, 1 - A, 2 - S, 3 - D
     public int lastMoved;
-    public enum Type { Forward, Right, Left, Back, Oposite }
+    public enum Type { Forward, Right, Left, Back, Oposite, Stand }
     public Type type;
 
     private void Update()
@@ -144,6 +144,8 @@ public class PlayerAuto : MonoBehaviour
                 break;
             case Type.Oposite:
                 MoveOposite();
+                break;
+            case Type.Stand:
                 break;
         }
 

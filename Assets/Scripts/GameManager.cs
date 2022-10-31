@@ -98,7 +98,10 @@ public class GameManager : MonoBehaviour
                     _currentKeyTarget.transform.position = player.transform.position;
                 }
                 player.GetComponent<Player>().CheckWon();
-                player.GetComponent<Player>().HasKey();
+                if (_currenthasKey)
+                {
+                    player.GetComponent<Player>().HasKey();
+                }
                 //Deactivate Players
                 player.GetComponent<Player>().active = false;
             }
