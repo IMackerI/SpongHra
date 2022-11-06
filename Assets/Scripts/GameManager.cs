@@ -6,7 +6,11 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public enum State { MOVING, MOVED, LEVELCOMPLETE, LEVELLOST };
+    public GameObject mainMenu;
+    public GameObject victoryScreen;
+    public GameObject playingScreen;
+
+    public enum State { MOVING, MOVED, LEVELCOMPLETE, LEVELLOST, MAINMENU, VICTORYSCREEN, PAUSESCREEN, COLLECTION };
     public State _state;
     public GameObject[] levels;
     public int[] levelMoves;
@@ -14,7 +18,7 @@ public class GameManager : MonoBehaviour
     GameObject _currentLevel;
     public float moveDelay;
     
-    int _levelIndex;
+    int _levelIndex = 0;
     [HideInInspector]
     public Vector3 _currentTarget;
     public GameObject _currentKeyTarget; //done now
@@ -42,7 +46,25 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Instance = this;
-        Restart(0);
+        mainMenu.SetActive(false);
+        victoryScreen.SetActive(false);
+        Switchstate(State.MAINMENU);
+    }
+
+    public void hitMainPlay()
+    {
+        Restart(_levelIndex);
+        Switchstate(State.MOVED);
+    }
+
+    public void hitMenu()
+    {
+        Switchstate(State.MAINMENU);
+    }
+
+    public void hitRestart()
+    {
+        Restart(_levelIndex);
     }
 
     void Restart(int levelIndex)
@@ -71,6 +93,8 @@ public class GameManager : MonoBehaviour
             _currentKeyTarget = _currentLevel.transform.Find("Key").gameObject; //implemented now
         }
 
+        playingScreen.SetActive(true);
+
         Switchstate(State.MOVED);
     }
 
@@ -81,7 +105,6 @@ public class GameManager : MonoBehaviour
             player.GetComponent<Player>().active = false;
         }
     }
-
 
     IEnumerator MovedDelay()
     {
@@ -127,6 +150,10 @@ public class GameManager : MonoBehaviour
     {
         switch (_state)
         {
+            case State.MAINMENU:
+                mainMenu.SetActive(true);
+                playingScreen.SetActive(false);
+                break;
             case State.MOVING:
                 Debug.Log("Started Playing");
                 moving = true;
@@ -134,7 +161,8 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(MovedDelay());
                 break;
             case State.LEVELCOMPLETE:
-                Restart(_levelIndex + 1);
+                playingScreen.SetActive(false);
+                victoryScreen.SetActive(true);
                 break;
             case State.LEVELLOST:
                 Restart(_levelIndex);
@@ -174,6 +202,12 @@ public class GameManager : MonoBehaviour
     {
         switch (_state)
         {
+            case State.MAINMENU:
+                mainMenu.SetActive(false);
+                break;
+            case State.LEVELCOMPLETE:
+                victoryScreen.SetActive(false);
+                break;
             case State.MOVING:
                 moving = false;
                 break;
