@@ -10,6 +10,36 @@ public class PlayerAuto : MonoBehaviour
     public int lastMoved;
     public enum Type { Forward, Right, Left, Back, Oposite, Stand }
     public Type type;
+    public GameObject WMarker, AMarker, SMarker, DMarker, OMarker;
+
+    private void Start()
+    {
+        WMarker.SetActive(false);
+        AMarker.SetActive(false);
+        SMarker.SetActive(false);
+        DMarker.SetActive(false);
+        OMarker.SetActive(false);
+        if(type == Type.Forward)
+        {
+            WMarker.SetActive(true);
+        }
+        else if(type == Type.Left)
+        {
+            AMarker.SetActive(true);
+        }
+        else if(type == Type.Back)
+        {
+            SMarker.SetActive(true);
+        }
+        else if(type == Type.Right)
+        {
+            DMarker.SetActive(true);
+        }
+        else if(type == Type.Oposite)
+        {
+            OMarker.SetActive(true);
+        }
+    }
 
     private void Update()
     {
